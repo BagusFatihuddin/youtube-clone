@@ -1,0 +1,42 @@
+.feed {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-column-gap: 16px;
+    grid-row-gap: 30px;
+    margin-top: 15px;
+}
+
+.card {
+    background: transparent;
+    border-radius: 15px;
+}
+
+.card img {
+    width: 100%;
+    border-radius: 15px;
+}
+
+.card h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: aliceblue;
+    margin: 5px 0;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+.card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: aliceblue;
+    margin: 5px 0;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.card p {
+    font-size: 14px;
+    color: rgb(255, 255, 255);
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+}
