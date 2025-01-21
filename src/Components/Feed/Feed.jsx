@@ -39,7 +39,8 @@ const Feed = ({ category }) => {
     return (
         <div className="feed">
             {data.map((item, index) => {
-                //item = isi, index =  urutan
+                // item = isi, index =  urutan
+                // map () Bayangkan API mengirimkan kotak besar berisi 50 kartu video. .map() seperti petugas yang mengambil setiap kartu, membacanya, dan meletakkannya di layar pengguna.
                 return (
                     <Link
                         to={`video/${item.snippet.categoryId}/${item.id}`}
