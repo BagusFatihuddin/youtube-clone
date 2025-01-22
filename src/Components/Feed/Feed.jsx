@@ -17,23 +17,46 @@ const Feed = ({ category }) => {
     // useEffect dipanggil.
     // Fungsi fetchData dijalankan untuk mengambil data baru dari API.
 
+    // const fetchData = async () => {
+    //     //fungsi ini bisa menunggu proses yang memakan waktu (seperti fetch) tanpa menghentikan alur eksekusi kode lainnya.
+
+    //     const videoList_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=50&regionCode=US&videoCategoryId=${category}&key=${API_KEY}`;
+    //     // menyimpan url buat ngambil data
+
+    //     const response = await fetch(videoList_url);
+    //     //fetch(videoList_url):
+    //     // Meminta data dari server di alamat videoList_url.
+    //     // response adalah hasil respons dari server.
+    //     // roses ini memakan waktu karena harus mengakses jaringan.
+    //     // await memastikan bahwa kode berikutnya akan menunggu hingga data dari server diterima.
+
+    //     const data = await response.json();
+    //     //ngubah data yang diterima menjadi format json biar gampang di proses oleh js
+
+    //     setData(data.items); // nyimpan data api ke varibael data
+    // };
+
     const fetchData = async () => {
-        //fungsi ini bisa menunggu proses yang memakan waktu (seperti fetch) tanpa menghentikan alur eksekusi kode lainnya.
-
         const videoList_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=50&regionCode=US&videoCategoryId=${category}&key=${API_KEY}`;
-        // menyimpan url buat ngambil data
-
         const response = await fetch(videoList_url);
-        //fetch(videoList_url):
-        // Meminta data dari server di alamat videoList_url.
-        // response adalah hasil respons dari server.
-        // roses ini memakan waktu karena harus mengakses jaringan.
-        // await memastikan bahwa kode berikutnya akan menunggu hingga data dari server diterima.
-
         const data = await response.json();
-        //ngubah data yang diterima menjadi format json biar gampang di proses oleh js
 
-        setData(data.items); // nyimpan data api ke varibael data
+        const videosWithChannelData = await Promise.all(
+            data.items.map(async (video) => {
+                const channelId = video.snippet.channelId;
+                const channel_url = `https://youtube.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${API_KEY}`;
+                const channelResponse = await fetch(channel_url);
+                const channelData = await channelResponse.json();
+
+                return {
+                    ...video,
+                    channelThumbnail:
+                        channelData.items[0].snippet.thumbnails.default.url,
+                };
+            })
+        );
+
+        setData(videosWithChannelData);
     };
 
     return (
@@ -53,15 +76,24 @@ const Feed = ({ category }) => {
                         // React bisa menghindari render ulang seluruh list jika elemen hanya bergeser atau berubah sedikit.
                     >
                         <img src={item.snippet.thumbnails.medium.url} alt="" />
-                        <h2>{item.snippet.title}</h2>
-                        <h3>{item.snippet.channelTitle}</h3>
-                        <p>
-                            {value_converter(item.statistics.viewCount)} views
-                            &bull;{" "}
-                            {moment(
-                                item.snippet.publishedAt || new Date()
-                            ).fromNow()}
-                        </p>
+                        <div className="channel-info">
+                            <img
+                                src={item.channelThumbnail}
+                                alt={item.snippet.channelTitle}
+                                className="channel-thumbnail"
+                            />
+                            <div>
+                                <h2>{item.snippet.title}</h2>
+                                <h3>{item.snippet.channelTitle}</h3>
+                                <p>
+                                    {value_converter(item.statistics.viewCount)}{" "}
+                                    views &bull;{" "}
+                                    {moment(
+                                        item.snippet.publishedAt || new Date()
+                                    ).fromNow()}
+                                </p>
+                            </div>
+                        </div>
                     </Link>
                 );
             })}
